@@ -73,35 +73,37 @@ module.exports = (function() {
     return argument && !!argument.class;
   };
 
-  var stringify = function(acc, val, key, obj) {
-    if(acc) {
-        acc += ',';
-    }
-
-    if(typeof val === 'undefined') {
-      val = null;
-    }
-
+  var stringify = function(accumulated, value, key, obj) {
     var newVal;
-    if(_.isObject(val)) {
-        newVal = '[' +  _.reduce(val, stringify, '') + ']' ;
-    } else {
-        newVal = JSON.stringify(val);
-    }
     var newKey = JSON.stringify(key);
-
     var newEntry;
-    if(_.isObject(obj) && !_.isArray(obj)) {
-        newEntry = newKey + ':' + newVal;
-    } else {
-        newEntry = newVal;
+
+    if (accumulated) {
+      accumulated += ',';
     }
 
-    return acc += newEntry;
+    if (typeof value === 'undefined') {
+      value = null;
+    }
+
+    if (_.isObject(value)) {
+      newVal = '[' +  _.reduce(value, stringify, '') + ']' ;
+    } else {
+      newVal = JSON.stringify(value);
+    }
+
+    if (_.isObject(obj) && !_.isArray(obj)) {
+      newEntry = newKey + ':' + newVal;
+    } else {
+      newEntry = newVal;
+    }
+
+    return accumulated += newEntry;
   };
 
   GremlinFunction.prototype.stringifyArgument = function(argument) {
-    return stringify('', argument, null, null);
+    var string = stringify('', argument, null, null);
+    return string;
   };
 
   return GremlinFunction;
